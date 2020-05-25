@@ -6,6 +6,8 @@ import {
   UsePipes,
   ValidationPipe,
   Body,
+  Param,
+  NotFoundException,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { NewTaskDto } from './dto/NewTaskDto';
@@ -20,10 +22,19 @@ export class TasksController {
 
   @Post()
   @UsePipes(ValidationPipe)
-  addTask(
+  async addTask(
     @Body() newTaskDto: NewTaskDto,
     @GetUserId() userId: number,
   ): Promise<Task> {
     return this.tasksService.addTask(newTaskDto, userId);
+  }
+
+  @Get(':id')
+  async getTask(@Param('id') id: number, @GetUserId() userId: number): Promise<Task> {
+    const task = await this.tasksService.getTaskById(id, userId);
+    if (!task) {
+      throw new NotFoundException(`Task with Id:${id} could not be found`);
+    }
+    return task;
   }
 }

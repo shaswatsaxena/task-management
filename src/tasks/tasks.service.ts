@@ -9,6 +9,10 @@ export class TasksService {
   constructor(@InjectRepository(Task) private tasks: Repository<Task>) {}
 
   async addTask(newTask: NewTaskDto, userId: number): Promise<Task> {
-    return await this.tasks.save({ ...newTask, userId });
+    return this.tasks.save({ ...newTask, userId });
+  }
+
+  async getTaskById(taskId: number, userId: number): Promise<Task> {
+    return this.tasks.findOne({ id: taskId, userId });
   }
 }
