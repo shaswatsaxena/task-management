@@ -9,7 +9,7 @@ import { TaskPriority } from '../enums/TaskPriority.enum';
 import { TaskLabel } from '../enums/TaskLabel.enum';
 import { TaskStatus } from '../enums/TaskStatus.enum';
 
-export class NewTaskDto {
+export class TaskDto {
   @IsString()
   @MaxLength(32)
   title: string;
