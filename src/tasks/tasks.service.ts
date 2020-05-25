@@ -15,4 +15,11 @@ export class TasksService {
   async getTaskById(taskId: number, userId: number): Promise<Task> {
     return this.tasks.findOne({ id: taskId, userId });
   }
+
+  async deleteTaskById(taskId: number, userId: number): Promise<Task> {
+    const task = this.tasks.findOne({ id: taskId, userId });
+    if (!task) return null;
+    await this.tasks.delete(taskId);
+    return task;
+  }
 }

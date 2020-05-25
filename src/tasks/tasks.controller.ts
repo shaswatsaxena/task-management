@@ -8,6 +8,7 @@ import {
   Body,
   Param,
   NotFoundException,
+  Delete,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { NewTaskDto } from './dto/NewTaskDto';
@@ -30,8 +31,23 @@ export class TasksController {
   }
 
   @Get(':id')
-  async getTask(@Param('id') id: number, @GetUserId() userId: number): Promise<Task> {
+  async getTask(
+    @Param('id') id: number,
+    @GetUserId() userId: number,
+  ): Promise<Task> {
     const task = await this.tasksService.getTaskById(id, userId);
+    if (!task) {
+      throw new NotFoundException(`Task with Id:${id} could not be found`);
+    }
+    return task;
+  }
+
+  @Delete(':id')
+  async deleteTask(
+    @Param('id') id: number,
+    @GetUserId() userId: number,
+  ): Promise<Task> {
+    const task = await this.tasksService.deleteTaskById(id, userId);
     if (!task) {
       throw new NotFoundException(`Task with Id:${id} could not be found`);
     }
