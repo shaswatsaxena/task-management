@@ -12,6 +12,11 @@ import { TaskStatus } from './enums/TaskStatus.enum';
 import { TaskLabel } from './enums/TaskLabel.enum';
 import { TaskPriority } from './enums/TaskPriority.enum';
 
+/**
+ * TypeORM Task Entity that maps to the 'task' database table
+ * @export
+ * @class Task
+ */
 @Entity()
 export class Task {
   @PrimaryGeneratedColumn()

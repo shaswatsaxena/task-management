@@ -5,19 +5,29 @@ import * as helmet from 'helmet';
 import * as rateLimit from 'express-rate-limit';
 import { AppModule } from './app.module';
 
+/**
+ * Boots up the APIs
+ */
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
-  app.enableCors();
+  //Cors setting to allow cross-site requests only from given frontend
+  app.enableCors({
+    origin: configService.get<string>('FRONTEND'),
+    credentials: true,
+  });
+  // Security Headers
   app.use(helmet());
+  // limit each IP to 100 requests per minute
   app.use(
     rateLimit({
-      windowMs: 60 * 1000, // 1 minute
-      max: 100, // limit each IP to 100 requests per windowMs
+      windowMs: 60 * 1000,
+      max: 100,
     }),
   );
 
+  // Setup Swagger for API docs
   const options = new DocumentBuilder()
     .setTitle('Task Management')
     .setDescription(
@@ -31,6 +41,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('/', app, document);
 
+  // Start server
   await app.listen(configService.get('PORT') || 3000);
 }
+
 bootstrap();

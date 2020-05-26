@@ -1,3 +1,4 @@
+// Possible values for sorting tasks
 export enum TaskSortKey {
   CREATED_AT__ASC = 'CREATED_AT__ASC',
   CREATED_AT__DESC = 'CREATED_AT__DESC',

@@ -14,6 +14,12 @@ import { TaskLabel } from '../enums/TaskLabel.enum';
 import { TaskStatus } from '../enums/TaskStatus.enum';
 import { TaskSortKey } from '../enums/TaskSortKey.enum';
 
+/**
+ * Data Transfer Object representing possible filter values that can be 
+ * provided when fetching tasks
+ * @export
+ * @class TaskFilterDto
+ */
 export class TaskFilterDto {
   @IsString()
   @IsOptional()

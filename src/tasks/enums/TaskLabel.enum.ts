@@ -1,3 +1,4 @@
+// Possible values for a Task Label
 export enum TaskLabel {
   PERSONAL = 'PERSONAL',
   WORK = 'WORK',

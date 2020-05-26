@@ -10,6 +10,11 @@ import { TaskPriority } from '../enums/TaskPriority.enum';
 import { TaskLabel } from '../enums/TaskLabel.enum';
 import { TaskStatus } from '../enums/TaskStatus.enum';
 
+/**
+ * Data Transfer Object representing a Task
+ * @export
+ * @class TaskDto
+ */
 export class TaskDto {
   @IsString()
   @MaxLength(32)

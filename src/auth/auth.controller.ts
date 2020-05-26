@@ -24,14 +24,31 @@ import { RegistrationDto } from './dto/RegistrationDto';
 import { AccessTokenDto } from './dto/AccessTokenDto';
 import { LoginDto } from './dto/LoginDto';
 
+/**
+ * Controller for /auth routes.
+ * @export
+ * @class AuthController
+ */
 @Controller('auth')
 @ApiTags('auth')
 @ApiInternalServerErrorResponse({
   description: 'Internal Server Error',
 })
 export class AuthController {
+  /**
+   * Creates an instance of AuthController.
+   * @param {AuthService} authService
+   * @memberof AuthController
+   */
   constructor(private authService: AuthService) {}
 
+  /**
+   * Tries to login a user and provide access-token.
+   * Handled by PassportJS local strategy
+   * @param {*} req
+   * @returns {Promise<AccessTokenDto>}
+   * @memberof AuthController
+   */
   @UseGuards(AuthGuard('local'))
   @Post('login')
   @HttpCode(200)
@@ -41,10 +58,16 @@ export class AuthController {
     type: AccessTokenDto,
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async login(@Request() req): Promise<AccessTokenDto> {
+  async login(@Request() req: any): Promise<AccessTokenDto> {
     return this.authService.login(req.user);
   }
 
+  /**
+   * Register a user or throw Conflict error if email already exits
+   * @param {RegistrationDto} registrationDto
+   * @returns {Promise<void>}
+   * @memberof AuthController
+   */
   @Post('register')
   @ApiCreatedResponse()
   @ApiConflictResponse({ description: `Email already registered!` })

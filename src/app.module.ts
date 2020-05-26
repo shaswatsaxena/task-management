@@ -5,9 +5,17 @@ import { TasksModule } from './tasks/tasks.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 
+/**
+ * Main App Module
+ * Sets up all other modules along with ConfigModule and TypeOrmModule
+ * @export
+ * @class AppModule
+ */
 @Module({
   imports: [
+    // Loads environment variables
     ConfigModule.forRoot(),
+    // Setup up TypeOrm connection to database asynchronously
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({

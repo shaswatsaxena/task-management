@@ -8,6 +8,11 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { AuthController } from './auth.controller';
 
+/**
+ * Imports ConfigModule, UsersModule, JWT module and PassportJS module
+ * @export
+ * @class AuthModule
+ */
 @Module({
   imports: [
     ConfigModule,

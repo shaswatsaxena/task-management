@@ -7,6 +7,11 @@ import {
   IsEmail,
 } from 'class-validator';
 
+/**
+ * Data Transfer Object provided for registration
+ * @export
+ * @class RegistrationDto
+ */
 export class RegistrationDto {
   @IsEmail()
   @ApiProperty()

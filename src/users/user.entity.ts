@@ -1,6 +1,11 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({name: "user_account"})
+/**
+ * TypeORM User Entity that maps to the 'user_account' database table
+ * @export
+ * @class User
+ */
+@Entity({ name: 'user_account' })
 export class User {
   @PrimaryGeneratedColumn()
   id: number;

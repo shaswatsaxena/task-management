@@ -1,3 +1,4 @@
+// Possible values for a Task Status
 export enum TaskStatus {
   PENDING = 'PENDING',
   IN_PROGRESS = 'IN_PROGRESS',
