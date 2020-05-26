@@ -1,6 +1,6 @@
 ## Description
 
-[HackerEarth StackHack 1.0](https://www.hackerearth.com/challenges/hackathon/stackhack-v1/) Todo List API.
+Task Management API built for [HackerEarth StackHack 1.0](https://www.hackerearth.com/challenges/hackathon/stackhack-v1/).
 
 ## Installation
 
