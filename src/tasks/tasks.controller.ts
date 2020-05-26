@@ -11,9 +11,11 @@ import {
   Delete,
   Put,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { TaskDto } from './dto/TaskDto';
+import { TaskFilterDto } from './dto/TaskFilterDto';
 import { GetUserId } from './getUserId.decorator';
 import { TasksService } from './tasks.service';
 import { Task } from './task.entity';
@@ -30,6 +32,15 @@ export class TasksController {
     @GetUserId() userId: number,
   ): Promise<Task> {
     return this.tasksService.addTask(newTaskDto, userId);
+  }
+
+  @Get()
+  @UsePipes(ValidationPipe)
+  async getTasks(
+    @Query() filters: TaskFilterDto,
+    @GetUserId() userId: number,
+  ): Promise<[Task[], number]> {
+    return this.tasksService.getTasks(filters, userId);
   }
 
   @Get(':id')
