@@ -19,6 +19,6 @@ export class UsersService {
   }
 
   async findByEmail(email: string): Promise<User> {
-    return this.users.findOneOrFail({ email });
+    return this.users.findOne({ email });
   }
 }
