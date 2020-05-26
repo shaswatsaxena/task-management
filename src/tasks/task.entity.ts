@@ -45,7 +45,7 @@ export class Task {
   })
   priority: TaskPriority;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'timestamp without time zone', nullable: true })
   due_date: Date;
 
   @CreateDateColumn()
