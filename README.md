@@ -8,6 +8,10 @@ Task Management API built for [HackerEarth StackHack 1.0](https://www.hackereart
 $ npm install
 ```
 
+* Requires PostgreSQL instance running 
+* Provide values to all sample.env variables
+* Rename sample.env to .env 
+
 ## Running the app
 
 ```bash
