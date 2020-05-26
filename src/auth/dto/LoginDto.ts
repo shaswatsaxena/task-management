@@ -7,7 +7,7 @@ import {
   IsEmail,
 } from 'class-validator';
 
-export class RegistrationDto {
+export class LoginDto {
   @IsEmail()
   @ApiProperty()
   email: string;
@@ -21,9 +21,4 @@ export class RegistrationDto {
   })
   @ApiProperty({ minLength: 8, maxLength: 20 })
   password: string;
-
-  @IsString()
-  @MaxLength(32)
-  @ApiProperty({ maxLength: 32 })
-  name: string;
 }

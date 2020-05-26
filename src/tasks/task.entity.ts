@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   Entity,
   Column,
@@ -14,18 +15,21 @@ import { TaskPriority } from './enums/TaskPriority.enum';
 @Entity()
 export class Task {
   @PrimaryGeneratedColumn()
+  @ApiProperty()
   id: number;
 
   @ManyToOne((type) => User, (user) => user.id)
   user: User;
 
-  @Column()
+  @Column({ select: false })
   userId: number;
 
   @Column({ length: 32 })
+  @ApiProperty({ maxLength: 32 })
   title: string;
 
   @Column({ type: 'text', nullable: true })
+  @ApiProperty({ required: false })
   description: string;
 
   @Column({
@@ -33,9 +37,11 @@ export class Task {
     enum: TaskStatus,
     default: TaskStatus.PENDING,
   })
+  @ApiProperty({ enum: TaskStatus })
   status: TaskStatus;
 
-  @Column({ type: 'enum', enum: TaskLabel, nullable: true })
+  @Column({ type: 'enum', enum: TaskLabel, default: TaskLabel.OTHER })
+  @ApiProperty({ enum: TaskLabel })
   label: TaskLabel;
 
   @Column({
@@ -43,14 +49,18 @@ export class Task {
     enum: TaskPriority,
     default: TaskPriority.NORMAL,
   })
+  @ApiProperty({ enum: TaskPriority })
   priority: TaskPriority;
 
   @Column({ type: 'timestamp without time zone', nullable: true })
+  @ApiProperty({ required: false })
   due_date: Date;
 
   @CreateDateColumn()
+  @ApiProperty()
   created_at: Date;
 
   @UpdateDateColumn()
+  @ApiProperty()
   updated_at: Date;
 }

@@ -13,6 +13,7 @@ import {
 import { TaskDto } from './dto/TaskDto';
 import { TaskFilterDto } from './dto/TaskFilterDto';
 import { Task } from './task.entity';
+import { TasksDto } from './dto/TasksDto';
 
 @Injectable()
 export class TasksService {
@@ -47,7 +48,7 @@ export class TasksService {
   async getTasks(
     filters: TaskFilterDto,
     userId: number,
-  ): Promise<[Task[], number]> {
+  ): Promise<TasksDto> {
     const skip = filters.offset ?? 0;
     const take = filters.limit ?? 10;
 
@@ -92,11 +93,11 @@ export class TasksService {
       where['created_at'] = LessThanOrEqual(filters.before_due_date);
     }
 
-    const sortKey = 
+    const sortKey =
       filters.sortKey?.split('__')[0].toLowerCase() || 'created_at';
     const sortOrder = filters.sortKey?.split('__')[1] || 'DESC';
 
-    const tasks = await this.tasks.findAndCount({
+    const result = await this.tasks.findAndCount({
       where,
       skip,
       take,
@@ -104,6 +105,6 @@ export class TasksService {
         [sortKey]: sortOrder,
       },
     });
-    return tasks;
+    return { tasks: result[0], count: result[1] };
   }
 }

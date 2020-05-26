@@ -5,4 +5,5 @@ export enum TaskLabel {
   TRAVEL = 'TRAVEL',
   HOME = 'HOME',
   OFFICE = 'OFFICE',
+  OTHER = 'OTHER',
 }
