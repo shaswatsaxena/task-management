@@ -12,10 +12,8 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "docs": "compodoc -p tsconfig.json",
-    "docs:serve": "compodoc -p tsconfig.json -s",
     "lint": "tslint -p tsconfig.json -c tslint.json",
-    "test": "cross-env NODE_ENV=test DATABASE_NAME=e2e_test jest"
+    "test": "cross-env NODE_ENV=test DATABASE_NAME=e2e_test jest --runInBand"
   },
   "dependencies": {
     "@nestjs/common": "^7.0.13",
@@ -74,6 +72,7 @@
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "verbose": true
   }
 }

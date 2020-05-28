@@ -31,24 +31,37 @@ describe('AuthController (e2e)', () => {
   });
 
   it('POST /auth/login with correct data', async () => {
+    const user = {
+      email: 'test@test.com',
+      password: 'Password@123',
+    };
+
+    await request(app.getHttpServer())
+      .post('/auth/register')
+      .send({
+        ...user,
+        name: 'Test',
+      });
+
     const { body } = await request(app.getHttpServer())
       .post('/auth/login')
-      .send({
-        email: 'test@test.com',
-        password: 'Password@123',
-      })
+      .send(user)
       .expect(200);
     expect(body).toHaveProperty('access_token');
   });
 
-  it('POST /auth/register with duplicate email', () => {
+  it('POST /auth/register with duplicate email', async () => {
+    const user = {
+      email: 'test@test.com',
+      password: 'Password@123',
+      name: 'Test',
+    };
+
+    await request(app.getHttpServer()).post('/auth/register').send(user);
+
     return request(app.getHttpServer())
       .post('/auth/register')
-      .send({
-        email: 'test@test.com',
-        password: 'Password@123',
-        name: 'Test',
-      })
+      .send(user)
       .expect(409);
   });
 
@@ -106,6 +119,12 @@ describe('AuthController (e2e)', () => {
   });
 
   it('POST /auth/login with incorrect password', async () => {
+    await request(app.getHttpServer()).post('/auth/register').send({
+      email: 'test@test.com',
+      password: 'Password@123',
+      name: 'Test',
+    });
+
     return request(app.getHttpServer())
       .post('/auth/login')
       .send({
@@ -115,8 +134,11 @@ describe('AuthController (e2e)', () => {
       .expect(401);
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await userRepository.query('DELETE FROM user_account;');
+  });
+
+  afterAll(async () => {
     await app.close();
   });
 });
