@@ -12,12 +12,10 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
+    "docs": "compodoc -p tsconfig.json",
+    "docs:serve": "compodoc -p tsconfig.json -s",
     "lint": "tslint -p tsconfig.json -c tslint.json",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test": "cross-env NODE_ENV=test DATABASE_NAME=e2e_test jest"
   },
   "dependencies": {
     "@nestjs/common": "^7.0.13",
@@ -54,6 +52,7 @@
     "@types/passport-jwt": "^3.0.3",
     "@types/passport-local": "^1.0.33",
     "@types/supertest": "^2.0.9",
+    "cross-env": "^7.0.2",
     "jest": "^26.0.1",
     "prettier": "^2.0.5",
     "supertest": "^4.0.2",
@@ -70,12 +69,11 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
-    "testRegex": ".spec.ts$",
+    "rootDir": ".",
+    "testRegex": ".e2e-spec.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
-    "coverageDirectory": "../coverage",
     "testEnvironment": "node"
   }
 }
