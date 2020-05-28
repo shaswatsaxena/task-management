@@ -112,28 +112,6 @@ export class TasksController {
   /**
    * Updates a single task with provided data otherwise return a 404 error
    * @param {number} id
-   * @param {number} userId
-   * @returns {Promise<Task>}
-   * @memberof TasksController
-   */
-  @Delete(':id')
-  @UsePipes(ValidationPipe)
-  @ApiOkResponse({ type: Task })
-  @ApiNotFoundResponse({ description: `Task could not be found` })
-  async deleteTask(
-    @Param('id', ParseIntPipe) id: number,
-    @GetUserId() userId: number,
-  ): Promise<Task> {
-    const task = await this.tasksService.deleteTaskById(id, userId);
-    if (!task) {
-      throw new NotFoundException(`Task could not be found`);
-    }
-    return task;
-  }
-
-  /**
-   * Deletes a single task for provided ID otherwise return a 404 error
-   * @param {number} id
    * @param {TaskDto} editTaskDto
    * @param {number} userId
    * @returns {Promise<Task>}
@@ -153,6 +131,28 @@ export class TasksController {
       editTaskDto,
       userId,
     );
+    if (!task) {
+      throw new NotFoundException(`Task could not be found`);
+    }
+    return task;
+  }
+
+  /**
+   * Deletes a single task for provided ID otherwise return a 404 error
+   * @param {number} id
+   * @param {number} userId
+   * @returns {Promise<Task>}
+   * @memberof TasksController
+   */
+  @Delete(':id')
+  @UsePipes(ValidationPipe)
+  @ApiOkResponse({ type: Task })
+  @ApiNotFoundResponse({ description: `Task could not be found` })
+  async deleteTask(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUserId() userId: number,
+  ): Promise<Task> {
+    const task = await this.tasksService.deleteTaskById(id, userId);
     if (!task) {
       throw new NotFoundException(`Task could not be found`);
     }
