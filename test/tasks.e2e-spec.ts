@@ -46,6 +46,20 @@ describe('TaskController (e2e)', () => {
     accessTokenY = user1.body.access_token;
   });
 
+  const seedTasks = async (): Promise<void> => {
+    const { body: createdTask } = await request(app.getHttpServer())
+      .post('/tasks')
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .send(seedData.tasks[0])
+      .expect(201);
+
+    await taskRepository.delete(createdTask.id);
+
+    await taskRepository.save(
+      seedData.tasks.map((task) => ({ ...task, userId: createdTask.userId })),
+    );
+  };
+
   it('POST /tasks with correct data', async () => {
     const { body } = await request(app.getHttpServer())
       .post('/tasks')
@@ -80,48 +94,134 @@ describe('TaskController (e2e)', () => {
       .expect(401);
   });
 
-  it('GET /tasks', async () => {
-    const { body: createdTask } = await request(app.getHttpServer())
-      .post('/tasks')
-      .set('Authorization', 'Bearer ' + accessTokenX)
-      .send(seedData.tasks[0])
-      .expect(201);
+  it('GET /tasks without filters', async () => {
+    await seedTasks();
 
-    const fetchedTasks = await request(app.getHttpServer())
+    const allTasks = await request(app.getHttpServer())
       .get(`/tasks`)
       .set('Authorization', 'Bearer ' + accessTokenX)
       .expect(200);
 
-    const { userId, ...createdTaskWithoutUserId } = createdTask;
-
-    expect(fetchedTasks.body.count).toBe(1);
-    expect(fetchedTasks.body.tasks[0]).toMatchObject(createdTaskWithoutUserId);
+    expect(allTasks.body.count).toBe(seedData.tasks.length);
+    expect(allTasks.body.tasks.length).toBe(10);
+    allTasks.body.tasks.forEach((fetchedTask: Task, index: number): void => {
+      expect(fetchedTask).toMatchObject(
+        seedData.tasks.find((task) => task.title === fetchedTask.title),
+      );
+    });
   });
 
-  it('GET /tasks with more tasks', async () => {
-    const { body: createdTask } = await request(app.getHttpServer())
-      .post('/tasks')
-      .set('Authorization', 'Bearer ' + accessTokenX)
-      .send(seedData.tasks[0])
-      .expect(201);
+  it('GET /tasks with limit filter', async () => {
+    await seedTasks();
 
-    await taskRepository.save(
-      seedData.tasks.map((task) => ({ ...task, userId: createdTask.userId })),
-    );
-
-    const fetchedTasks = await request(app.getHttpServer())
-      .get(`/tasks`)
+    const limitTasks = await request(app.getHttpServer())
+      .get(`/tasks?limit=100`)
       .set('Authorization', 'Bearer ' + accessTokenX)
       .expect(200);
 
-    expect(fetchedTasks.body.count).toBe(seedData.tasks.length + 1);
-    fetchedTasks.body.tasks.forEach(
-      (fetchedTask: Task, index: number): void => {
-        const key = index === 0 ? 0 : index - 1;
-        expect(fetchedTask).toMatchObject(seedData.tasks[index]);
-      },
-    );
+    expect(limitTasks.body.count).toBe(seedData.tasks.length);
+    expect(limitTasks.body.tasks.length).toBe(100);
+
+    await request(app.getHttpServer())
+      .get(`/tasks?limit=0`)
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(400);
+
+    await request(app.getHttpServer())
+      .get(`/tasks?limit=101`)
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(400);
   });
+
+  it('GET /tasks with offset filter', async () => {
+    await seedTasks();
+
+    const noOffsetTask = await request(app.getHttpServer())
+      .get(`/tasks?limit=11&offset=0`)
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(200);
+
+    const offsetTask = await request(app.getHttpServer())
+      .get(`/tasks?limit=1&offset=10`)
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(200);
+
+    expect(noOffsetTask.body.tasks[10]).toEqual(offsetTask.body.tasks[0]);
+
+    await request(app.getHttpServer())
+      .get(`/tasks?offset=-1`)
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(400);
+  });
+
+  it('GET /tasks with search filter', async () => {
+    await seedTasks();
+    const taskToSearch = seedData.tasks[0];
+
+    const searchTasks = await request(app.getHttpServer())
+      .get(`/tasks?search=${taskToSearch.title}`)
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(200);
+
+    expect(searchTasks.body.tasks[0]).toMatchObject(taskToSearch);
+  });
+
+  it('GET /tasks with status filter', async () => {
+    await seedTasks();
+
+    const doneTasks = await request(app.getHttpServer())
+      .get(`/tasks?status=DONE`)
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(200);
+
+    doneTasks.body.tasks.forEach((task) => expect(task.status).toBe('DONE'));
+
+    await request(app.getHttpServer())
+      .get(`/tasks?status=INCORRECT_STATUS`)
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(400);
+  });
+
+  it('GET /tasks with priority filter', async () => {
+    await seedTasks();
+
+    const lowTasks = await request(app.getHttpServer())
+      .get(`/tasks?priority=LOW`)
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(200);
+
+    lowTasks.body.tasks.forEach((task) => expect(task.priority).toBe('LOW'));
+
+    await request(app.getHttpServer())
+      .get(`/tasks?priority=INCORRECT`)
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(400);
+  });
+
+  // it('GET /tasks with labels filter', async () => {
+  //   await seedTasks();
+
+  //   const workTasks = await request(app.getHttpServer())
+  //     .get(`/tasks?labels[]=WORK`)
+  //     .set('Authorization', 'Bearer ' + accessTokenX)
+  //     .expect(200);
+
+  //   workTasks.body.tasks.forEach((task) => expect(task.label).toBe('WORK'));
+
+  //   const PersonalOtherTasks = await request(app.getHttpServer())
+  //     .get(`/tasks?labels=PERSONAL,OTHER`)
+  //     .set('Authorization', 'Bearer ' + accessTokenX)
+  //     .expect(200);
+
+  //   PersonalOtherTasks.body.tasks.forEach((task) =>
+  //     expect(task.label).toEqual(expect.stringMatching(/PERSONAL|OTHER/)),
+  //   );
+
+  //   await request(app.getHttpServer())
+  //     .get(`/tasks?label[]=INCORRECT`)
+  //     .set('Authorization', 'Bearer ' + accessTokenX)
+  //     .expect(400);
+  // });
 
   it('GET /tasks/:id', async () => {
     const { body: createdTask } = await request(app.getHttpServer())
