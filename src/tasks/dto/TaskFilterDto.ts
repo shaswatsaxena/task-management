@@ -15,7 +15,7 @@ import { TaskStatus } from '../enums/TaskStatus.enum';
 import { TaskSortKey } from '../enums/TaskSortKey.enum';
 
 /**
- * Data Transfer Object representing possible filter values that can be 
+ * Data Transfer Object representing possible filter values that can be
  * provided when fetching tasks
  * @export
  * @class TaskFilterDto
@@ -46,15 +46,15 @@ export class TaskFilterDto {
   @ApiPropertyOptional({ enum: TaskStatus })
   status: TaskStatus;
 
-  @IsEnum(TaskLabel, { each: true })
-  @IsOptional()
-  @ApiPropertyOptional({ isArray: true, enum: TaskLabel })
-  labels: TaskLabel[];
-
   @IsEnum(TaskPriority)
   @IsOptional()
   @ApiPropertyOptional({ enum: TaskPriority })
   priority: TaskPriority;
+
+  @IsEnum(TaskLabel, { each: true })
+  @IsOptional()
+  @ApiPropertyOptional({ isArray: true, enum: TaskLabel })
+  labels: TaskLabel[];
 
   @IsDateString()
   @IsOptional()
@@ -71,13 +71,13 @@ export class TaskFilterDto {
   @ApiPropertyOptional()
   before_created_at: Date;
 
-  @IsEnum(TaskSortKey)
-  @IsOptional()
-  @ApiPropertyOptional({ enum: TaskSortKey })
-  sortKey: TaskSortKey;
-
   @IsDateString()
   @IsOptional()
   @ApiPropertyOptional()
   after_created_at: Date;
+
+  @IsEnum(TaskSortKey)
+  @IsOptional()
+  @ApiPropertyOptional({ enum: TaskSortKey })
+  sortKey: TaskSortKey;
 }
