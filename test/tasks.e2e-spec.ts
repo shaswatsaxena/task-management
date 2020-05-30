@@ -198,30 +198,183 @@ describe('TaskController (e2e)', () => {
       .expect(400);
   });
 
-  // it('GET /tasks with labels filter', async () => {
-  //   await seedTasks();
+  it('GET /tasks with labels filter', async () => {
+    await seedTasks();
 
-  //   const workTasks = await request(app.getHttpServer())
-  //     .get(`/tasks?labels[]=WORK`)
-  //     .set('Authorization', 'Bearer ' + accessTokenX)
-  //     .expect(200);
+    const workTasks = await request(app.getHttpServer())
+      .get(`/tasks?labels[]=WORK`)
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(200);
 
-  //   workTasks.body.tasks.forEach((task) => expect(task.label).toBe('WORK'));
+    workTasks.body.tasks.forEach((task) => expect(task.label).toBe('WORK'));
 
-  //   const PersonalOtherTasks = await request(app.getHttpServer())
-  //     .get(`/tasks?labels=PERSONAL,OTHER`)
-  //     .set('Authorization', 'Bearer ' + accessTokenX)
-  //     .expect(200);
+    const PersonalOtherTasks = await request(app.getHttpServer())
+      .get(`/tasks?labels[]=PERSONAL&labels[]=OTHER&limit=100`)
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(200);
 
-  //   PersonalOtherTasks.body.tasks.forEach((task) =>
-  //     expect(task.label).toEqual(expect.stringMatching(/PERSONAL|OTHER/)),
-  //   );
+    expect(PersonalOtherTasks.body.count).toBe(
+      seedData.tasks.filter(
+        (task) => task.label === 'PERSONAL' || task.label === 'OTHER',
+      ).length,
+    );
+    PersonalOtherTasks.body.tasks.forEach((task) =>
+      expect(task.label).toEqual(expect.stringMatching(/PERSONAL|OTHER/)),
+    );
 
-  //   await request(app.getHttpServer())
-  //     .get(`/tasks?label[]=INCORRECT`)
-  //     .set('Authorization', 'Bearer ' + accessTokenX)
-  //     .expect(400);
-  // });
+    await request(app.getHttpServer())
+      .get(`/tasks?labels=NOT_ARRAY`)
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(400);
+
+    await request(app.getHttpServer())
+      .get(`/tasks?labels[]=INCORRECT`)
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(400);
+  });
+
+  it('GET /tasks with after_due_date filter', async () => {
+    await seedTasks();
+    const date = new Date('2020-05-28T00:00:00.000Z');
+
+    const after28Tasks = await request(app.getHttpServer())
+      .get(`/tasks?after_due_date=${date.toISOString()}`)
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(200);
+
+    after28Tasks.body.tasks.forEach((task) => {
+      if (task.date) {
+        const taskDate = new Date(task.due_date);
+        expect(taskDate >= date).toBeTruthy();
+      }
+    });
+
+    await request(app.getHttpServer())
+      .get(`/tasks?after_due_date=INCORRECT`)
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(400);
+  });
+
+  it('GET /tasks with before_due_date filter', async () => {
+    await seedTasks();
+    const date = new Date('2020-05-28T00:00:00.000Z');
+
+    const before28Tasks = await request(app.getHttpServer())
+      .get(`/tasks?before_due_date=${date.toISOString()}`)
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(200);
+
+    before28Tasks.body.tasks.forEach((task) => {
+      if (task.date) {
+        const taskDate = new Date(task.due_date);
+        expect(taskDate <= date).toBeTruthy();
+      }
+    });
+
+    await request(app.getHttpServer())
+      .get(`/tasks?before_due_date=INCORRECT`)
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(400);
+  });
+
+  it('GET /tasks with before_due_date & after_due_date filter', async () => {
+    await seedTasks();
+    const afterDate = new Date('2020-05-27T00:00:00.000Z');
+    const beforeDate = new Date('2020-05-28T00:00:00.000Z');
+
+    const betweenTasks = await request(app.getHttpServer())
+      .get(
+        `/tasks?before_due_date=${beforeDate.toISOString()}` +
+          `&after_due_date=${afterDate.toISOString()}`,
+      )
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(200);
+
+    betweenTasks.body.tasks.forEach((task) => {
+      if (task.date) {
+        const taskDate = new Date(task.due_date);
+        expect(taskDate >= afterDate).toBeTruthy();
+        expect(taskDate <= beforeDate).toBeTruthy();
+      }
+    });
+  });
+
+  it('GET /tasks with after_created_at filter', async () => {
+    const date = new Date(Date.now());
+    await seedTasks();
+
+    const afterNowTasks = await request(app.getHttpServer())
+      .get(`/tasks?after_created_at=${date.toISOString()}`)
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(200);
+
+    afterNowTasks.body.tasks.forEach((task) => {
+      const taskDate = new Date(task.created_at);
+      expect(taskDate >= date).toBeTruthy();
+    });
+
+    await request(app.getHttpServer())
+      .get(`/tasks?after_created_at=INCORRECT`)
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(400);
+  });
+
+  it('GET /tasks with before_created_at filter', async () => {
+    await seedTasks();
+    const date = new Date(Date.now());
+
+    const beforeNowTasks = await request(app.getHttpServer())
+      .get(`/tasks?before_created_at=${date.toISOString()}`)
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(200);
+
+    beforeNowTasks.body.tasks.forEach((task) => {
+      const taskDate = new Date(task.created_at);
+      expect(taskDate <= date).toBeTruthy();
+    });
+
+    await request(app.getHttpServer())
+      .get(`/tasks?before_created_at=INCORRECT`)
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(400);
+  });
+
+  it('GET /tasks with before_created_at & after_created_at filter', async () => {
+    const afterDate = new Date(Date.now());
+    await seedTasks();
+    const beforeDate = new Date(Date.now());
+
+    const betweenTasks = await request(app.getHttpServer())
+      .get(
+        `/tasks?before_created_at=${beforeDate.toISOString()}` +
+          `&after_created_at=${afterDate.toISOString()}`,
+      )
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(200);
+
+    betweenTasks.body.tasks.forEach((task) => {
+      const taskDate = new Date(task.created_at);
+      expect(taskDate >= afterDate).toBeTruthy();
+      expect(taskDate <= beforeDate).toBeTruthy();
+    });
+  });
+
+  it('GET /tasks with sortKey', async () => {
+    await seedTasks();
+
+    const descTitleTasks = await request(app.getHttpServer())
+      .get(`/tasks?sortKey=TITLE__DESC`)
+      .set('Authorization', 'Bearer ' + accessTokenX)
+      .expect(200);
+
+    descTitleTasks.body.tasks.forEach((task, index) => {
+      if (index < descTitleTasks.body.tasks.length - 2) {
+        expect(
+          task.title >= descTitleTasks.body.tasks[index + 1].title,
+        ).toBeTruthy();
+      }
+    });
+  });
 
   it('GET /tasks/:id', async () => {
     const { body: createdTask } = await request(app.getHttpServer())
