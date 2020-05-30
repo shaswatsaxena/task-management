@@ -8,9 +8,9 @@ Task Management API built for [HackerEarth StackHack 1.0](https://www.hackereart
 $ npm install
 ```
 
-* Requires PostgreSQL instance running 
-* Provide values to all sample.env variables
-* Rename sample.env to .env 
+- Requires PostgreSQL instance running
+- Provide values to all sample.env variables
+- Rename sample.env to .env
 
 ## Running the app
 
@@ -26,6 +26,8 @@ $ npm run start:prod
 ```
 
 ## Test
+
+Create a database named "e2e_test" to be used for testing.
 
 ```bash
 # end to end tests
