@@ -7,6 +7,7 @@ import {
   IsInt,
   Max,
   Min,
+  IsArray,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { TaskPriority } from '../enums/TaskPriority.enum';
@@ -52,6 +53,7 @@ export class TaskFilterDto {
   priority: TaskPriority;
 
   @IsEnum(TaskLabel, { each: true })
+  @IsArray()
   @IsOptional()
   @ApiPropertyOptional({ isArray: true, enum: TaskLabel })
   labels: TaskLabel[];

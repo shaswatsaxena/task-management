@@ -2,7 +2,7 @@
 export enum TaskLabel {
   PERSONAL = 'PERSONAL',
   WORK = 'WORK',
-  SHOPPING = 'NORMAL',
+  SHOPPING = 'SHOPPING',
   TRAVEL = 'TRAVEL',
   HOME = 'HOME',
   OFFICE = 'OFFICE',
