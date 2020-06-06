@@ -23,7 +23,7 @@ export class TaskDto {
 
   @IsString()
   @IsOptional()
-  @ApiProperty()
+  @ApiPropertyOptional()
   description: string;
 
   @IsEnum(TaskStatus)
